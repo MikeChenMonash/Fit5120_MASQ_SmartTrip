@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Smart Trip</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <style>
+            html, body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            h1 {
+                text-align: center;
+            }
+            ul {
+                width: 900px;
+                padding: 15px;
+                margin: 10px;
+                border-top: 2px solid #000;
+                border-bottom: 1px solid #000;
+                text-align: center;
+            }
+            li {
+               display: inline;
+               margin: 0px 3px;
+            }
+            #map {
+                height: 100%;
+            }
+            #panel {
+                position: absolute;
+                top: 10px;
+                left: 25%;
+                z-index: 5;
+                background-color: #fff;
+                padding: 5px;
+                border: 1px solid #999;
+                text-align: center;
+            }
+
+            #panel, .panel {
+                font-family: 'Roboto','sans-serif';
+                line-height: 30px;
+                padding-left: 10px;
+            }
+
+            #panel select, #panel input, .panel select, .panel input {
+                font-size: 15px;
+            }
+
+            #panel select, .panel select {
+                width: 100%;
+            }
+
+            #panel i, .panel i {
+                font-size: 12px;
+            }
+
+            .panel {
+                height: 100%;
+                overflow: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div></div>
+        <header>
+            <h1>Smart Trip</h1>
+            <nav>
+                <ul>
+                    <li><a href="" class="current">Home</a></li>
+                    <li><a href="">Sign in</a></li>
+                    <li><a href="">Sign up</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <section class="truck-infor">
+            <h2>something</h2>
+            <fieldset>
+                <legend>Truck information</legend>
+                <label>Truck Height:</label><input type="text" name="truck-height"><br />
+                <label>Truck Length:</label><input type="text" name="truck-length"><br />
+                <label>Truck Weight:</label><input type="text" name="truck-weight"><br />
+                <label>Truck Width:</label><input type="text" name="truck-width">
+                <div class="submit"><input type="submit" value="Submit" /></div>
+            </fieldset>
+        </section>
+        
+
+        <!--Google Maps API-->
+        <div id="map" style="float:left;width:63%; height:100%"></div>
+        <div id="directionsPanel" class="panel" style="float:right;width:34%;height:100%">
+            <p>Total Distance: <span id="total"></span></p>
+        </div>
+        <script>
+            function initMap() {
+                var map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 7,
+                    center: {lat: -37.49, lng: 145.58}
+                });
+
+                var directionsService = new google.maps.DirectionsService;
+                var directionsDisplay = new google.maps.DirectionsRenderer({
+                    draggable: true,
+                    map: map,
+                    panel: document.getElementById('directionsPanel')
+                });
+
+                directionsDisplay.addListener('directions_changed', function () {
+                    computeTotalDistance(directionsDisplay.getDirections());
+                });
+
+                /*displayRoute('Perth, WA', 'Sydney, NSW', directionsService,
+                        directionsDisplay);*/
+            }
+
+            function displayRoute(origin, destination, service, display) {
+                service.route({
+                    origin: origin,
+                    destination: destination,
+                    waypoints: [{location: 'Cocklebiddy, WA'}, {location: 'Broken Hill, NSW'}],
+                    travelMode: google.maps.TravelMode.DRIVING,
+                    avoidTolls: true //TOLL!!!!
+                }, function (response, status) {
+                    if (status === google.maps.DirectionsStatus.OK) {
+                        display.setDirections(response);
+                    } else {
+                        alert('Could not display directions due to: ' + status);
+                    }
+                });
+            }
+
+            function computeTotalDistance(result) {
+                var total = 0;
+                var myroute = result.routes[0];
+                for (var i = 0; i < myroute.legs.length; i++) {
+                    total += myroute.legs[i].distance.value;
+                }
+                total = total / 1000;
+                document.getElementById('total').innerHTML = total + ' km';
+            }
+
+        </script>
+        <script src="https://maps.googleapis.com/maps/api/js?signed_in=true&callback=initMap"
+        async defer></script>
+    </body>
+</html>
